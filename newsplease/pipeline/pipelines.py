@@ -561,3 +561,24 @@ class DateFilter(object):
                 raise DropItem('DateFilter: %s: Article is too young: %s ' % (item['url'], publish_date))
             else:
                 return item
+
+
+class KeywordFilter(object):
+    log = None
+    cfg = None
+    keywords = []
+
+    def __init__(self):
+        self.log = logging.getLogger(__name__ + '.KeywordFilter')
+        self.cfg = CrawlerConfig.get_instance()
+        self.config = self.cfg.section('KeywordFilter')
+        self.keywords = self.config['keywords']
+
+    def process_item(self, item, spider):
+        text = item['article_text'].lower()
+
+        for keyword in self.keywords:
+            if keyword.lower() in text:
+                return item
+
+        raise DropItem('KeywordFilter: %s: Doesnt contain any keywords' % item['url'])
